@@ -133,6 +133,13 @@
     animation:stampSlam 0.45s cubic-bezier(.36,.07,.19,.97) both;
   }
 
+  @keyframes stampSlamCentered{
+    0%{ opacity:0; transform:rotate(-4deg) scale(2.4); }
+    60%{ opacity:1; transform:rotate(-6deg) scale(0.9); }
+    75%{ transform:rotate(-3deg) scale(1.08); }
+    100%{ opacity:1; transform:rotate(-4deg) scale(1); }
+  }
+
   #accessOverlay{
     position:fixed; inset:0; z-index:100; background:#0b0c08; display:flex; align-items:center; justify-content:center;
     opacity:1; transition:opacity 0.5s ease; padding:0 20px; box-sizing:border-box;
@@ -143,8 +150,8 @@
     font-family:'IBM Plex Mono',monospace; font-weight:700;
     letter-spacing:clamp(1px,1.2vw,6px); font-size:clamp(14px,5.2vw,22px);
     white-space:nowrap; max-width:100%; box-sizing:border-box; text-align:center;
-    transform:rotate(-4deg); box-shadow:0 0 40px rgba(125,179,125,0.25);
-    animation:stampSlam 0.6s cubic-bezier(.36,.07,.19,.97) both;
+    box-shadow:0 0 40px rgba(125,179,125,0.25);
+    animation:stampSlamCentered 0.6s cubic-bezier(.36,.07,.19,.97) both;
   }
 
   .footerFade{ opacity:0; }
