@@ -94,11 +94,111 @@
   .clearance span{
     font-size:9px; letter-spacing:2px; color:#b3372c; font-weight:700; white-space:nowrap;
   }
+
+  /* film grain */
+  .grain{
+    position:absolute; inset:0; pointer-events:none; z-index:5; opacity:0.05; mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    animation:grainShift 0.4s steps(4) infinite;
+  }
+  @keyframes grainShift{
+    0%{transform:translate(0,0);} 25%{transform:translate(-2%,1%);} 50%{transform:translate(1%,-1%);} 75%{transform:translate(-1%,2%);} 100%{transform:translate(0,0);}
+  }
+
+  /* stamp slam animation */
+  @keyframes stampSlam{
+    0%{ opacity:0; transform:translate(-50%,-50%) rotate(-4deg) scale(2.4); }
+    60%{ opacity:1; transform:translate(-50%,-50%) rotate(-6deg) scale(0.9); }
+    75%{ transform:translate(-50%,-50%) rotate(-3deg) scale(1.08); }
+    100%{ opacity:1; transform:translate(-50%,-50%) rotate(-4deg) scale(1); }
+  }
+  .stamp{
+    animation:stampSlam 0.5s cubic-bezier(.36,.07,.19,.97) both;
+    animation-delay:0.3s;
+    opacity:0;
+  }
+  .accessGranted{
+    position:relative; text-align:center; margin:0 0 6px;
+  }
+  .accessGranted span{
+    display:inline-block; color:#7db37d; border:2px solid #7db37d; padding:4px 12px;
+    font-family:'IBM Plex Mono',monospace; font-weight:700; letter-spacing:3px; font-size:12px;
+    transform:translate(-50%,-50%) rotate(3deg); position:relative; left:50%; top:0;
+    animation:stampSlam 0.45s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  #accessOverlay{
+    position:fixed; inset:0; z-index:100; background:#0b0c08; display:flex; align-items:center; justify-content:center;
+    opacity:1; transition:opacity 0.5s ease;
+  }
+  #accessOverlay.fadeOut{ opacity:0; pointer-events:none; }
+  #accessOverlay .bigStamp{
+    color:#7db37d; border:4px solid #7db37d; padding:14px 34px;
+    font-family:'IBM Plex Mono',monospace; font-weight:700; letter-spacing:6px; font-size:22px;
+    transform:rotate(-4deg); box-shadow:0 0 40px rgba(125,179,125,0.25);
+    animation:stampSlam 0.6s cubic-bezier(.36,.07,.19,.97) both;
+  }
+
+  .footerFade{ opacity:0; }
+
+  /* photo declassifying */
+  .photoWrap img{
+    filter:blur(10px) grayscale(1) contrast(1.2) brightness(0.9) saturate(0.6);
+    transition:filter 1.4s ease-out;
+  }
+  .photoWrap.declassified img{
+    filter:blur(0px) grayscale(1) contrast(1.2) brightness(0.9);
+  }
+
+  /* decrypting timeline */
+  .item{
+    opacity:0; animation:decryptIn 0.5s ease-out forwards;
+  }
+  @keyframes decryptIn{
+    0%{ opacity:0; transform:translateX(-6px); filter:blur(3px); }
+    100%{ opacity:1; transform:translateX(0); filter:blur(0); }
+  }
+  .clearance{
+    opacity:0; animation:decryptIn 0.5s ease-out forwards;
+  }
+
+
+  /* countdown */
+  .countdown{
+    display:flex; justify-content:center; gap:14px; padding:4px 24px 18px;
+  }
+  .countdown .cbox{ text-align:center; }
+  .countdown .cnum{
+    font-family:'Oswald',sans-serif; font-weight:700; font-size:20px; color:#e7e8da; line-height:1;
+  }
+  .countdown .clab{
+    font-size:8px; letter-spacing:2px; color:#7d8065; margin-top:2px;
+  }
+  .countdown .csep{ color:#33362a; font-size:18px; align-self:flex-start; margin-top:1px; }
 </style>
 </head>
 <body>
 
+<div id="gate" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#12140f;font-family:'IBM Plex Mono',monospace;color:#c9cbb8;padding:20px;">
+  <div style="max-width:340px;width:100%;text-align:center;">
+    <div style="color:#b3372c;border:2px solid #b3372c;display:inline-block;padding:4px 10px;font-weight:700;letter-spacing:3px;font-size:12px;transform:rotate(-4deg);margin-bottom:24px;">CLASSIFIED</div>
+    <div style="font-family:'Oswald',sans-serif;font-weight:700;text-transform:uppercase;font-size:20px;letter-spacing:2px;margin-bottom:8px;color:#e7e8da;">Access Restricted</div>
+    <div style="font-size:11px;color:#7d8065;letter-spacing:1px;margin-bottom:24px;line-height:1.6;">Enter clearance code to view mission briefing</div>
+    <input id="pw" type="password" placeholder="CLEARANCE CODE" style="width:100%;background:#1a1c14;border:1px solid #33362a;color:#c9cbb8;padding:12px 14px;font-family:'IBM Plex Mono',monospace;font-size:13px;letter-spacing:2px;text-align:center;text-transform:uppercase;margin-bottom:14px;outline:none;">
+    <br>
+    <button onclick="checkPw()" style="background:#b3372c;color:#e7e8da;border:none;padding:12px 28px;font-family:'IBM Plex Mono',monospace;font-weight:600;letter-spacing:2px;font-size:11px;cursor:pointer;">VERIFY</button>
+    <div id="pwerror" style="color:#b3372c;font-size:10px;letter-spacing:1px;margin-top:14px;display:none;">ACCESS DENIED — INCORRECT CODE</div>
+  </div>
+</div>
+
+<div id="accessOverlay" style="display:none;">
+  <div class="bigStamp">ACCESS GRANTED</div>
+</div>
+
+<div id="content" style="display:none;">
+
 <div class="frame">
+  <div class="grain"></div>
   <div class="topbar"><span>FILE NO. 0713-BP</span><span>EYES ONLY</span></div>
   <div class="stamp">CLASSIFIED</div>
   <h1>Operation: Last Call</h1>
@@ -112,6 +212,17 @@
       <b>Mission:</b> Escort Ring Bearer through his final day of active duty. Deliver him to the altar unscathed and with legendary stories intact.
     </div>
   </div>
+
+  <div class="countdown" id="countdown">
+    <div class="cbox"><div class="cnum" id="cd-d">--</div><div class="clab">DAYS</div></div>
+    <div class="csep">:</div>
+    <div class="cbox"><div class="cnum" id="cd-h">--</div><div class="clab">HRS</div></div>
+    <div class="csep">:</div>
+    <div class="cbox"><div class="cnum" id="cd-m">--</div><div class="clab">MIN</div></div>
+    <div class="csep">:</div>
+    <div class="cbox"><div class="cnum" id="cd-s">--</div><div class="clab">SEC</div></div>
+  </div>
+  <div style="text-align:center;font-size:8px;letter-spacing:2px;color:#5c5f4c;padding-bottom:14px;">T-MINUS TO PERIMETER CHECK</div>
 
   <div class="sectionlabel">MISSION TIMELINE</div>
   <div class="divider" style="margin-top:-10px;"></div>
@@ -151,8 +262,103 @@
     <div class="desc">Return to Base<span class="loc">Mission complete</span></div>
   </div>
 
-  <div class="footer">GENTLEMEN, SEE YOU AT FUKU</div>
+  <div id="theFooter" class="footer footerFade">GENTLEMEN, SEE YOU AT FUKU</div>
 </div>
+
+</div>
+
+<script>
+const CODE = "FUKU2026";
+
+function staggerItems(startDelay, gap){
+  const nodes = document.querySelectorAll('.item, .clearance');
+  let delay = startDelay;
+  nodes.forEach(function(el){
+    el.style.animationDelay = delay + 's';
+    delay += gap;
+  });
+  return delay; // delay after the last node's start
+}
+
+function declassifyPhotoAt(delaySeconds){
+  const wrap = document.querySelector('.photoWrap');
+  if(wrap){
+    setTimeout(function(){ wrap.classList.add('declassified'); }, delaySeconds * 1000);
+  }
+}
+
+function revealFooterAt(delaySeconds){
+  const footer = document.getElementById('theFooter');
+  if(footer){
+    footer.style.transition = 'opacity 1.2s ease';
+    setTimeout(function(){ footer.style.opacity = '1'; }, delaySeconds * 1000);
+  }
+}
+
+function startCountdown(){
+  const target = new Date(2026, 6, 18, 10, 45, 0).getTime();
+  function tick(){
+    const now = Date.now();
+    let diff = target - now;
+    if(diff < 0) diff = 0;
+    const d = Math.floor(diff / 86400000);
+    const h = Math.floor((diff % 86400000) / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const s = Math.floor((diff % 60000) / 1000);
+    const pad = function(n){ return String(n).padStart(2,'0'); };
+    document.getElementById('cd-d').textContent = d;
+    document.getElementById('cd-h').textContent = pad(h);
+    document.getElementById('cd-m').textContent = pad(m);
+    document.getElementById('cd-s').textContent = pad(s);
+  }
+  tick();
+  setInterval(tick, 1000);
+}
+
+function beginSequence(){
+  document.getElementById('content').style.display = 'flex';
+  document.getElementById('content').style.justifyContent = 'center';
+  startCountdown();
+  // slower, top-to-bottom reveal: ~0.55s between each mission line
+  const lastStart = staggerItems(0.4, 0.55);
+  const endOfSequence = lastStart + 0.6; // just after the last item finishes animating in
+  declassifyPhotoAt(endOfSequence);
+  revealFooterAt(endOfSequence);
+}
+
+function revealContent(withOverlay){
+  document.getElementById('gate').style.display = 'none';
+  if(withOverlay){
+    const overlay = document.getElementById('accessOverlay');
+    overlay.style.display = 'flex';
+    setTimeout(function(){
+      overlay.classList.add('fadeOut');
+      setTimeout(function(){
+        overlay.style.display = 'none';
+        beginSequence();
+      }, 500);
+    }, 1700);
+  } else {
+    beginSequence();
+  }
+}
+
+function checkPw(){
+  const val = document.getElementById('pw').value.trim().toUpperCase();
+  if(val === CODE){
+    sessionStorage.setItem('cleared', '1');
+    revealContent(true);
+  } else {
+    document.getElementById('pwerror').style.display = 'block';
+  }
+}
+document.getElementById('pw').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') checkPw();
+});
+if(sessionStorage.getItem('cleared') === '1'){
+  revealContent(false);
+}
+</script>
 
 </body>
 </html>
